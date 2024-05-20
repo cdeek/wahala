@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-//import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { Providers } from './_providers'
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -11,23 +11,22 @@ export const metadata: Metadata = {
   description: "Under development",
 };
 
-// const client = new ApolloClient({
-//   uri: '/api/graphql',
-//   cache: new InMemoryCache(),
-// });
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         
       </head>
       <body className={inter.className}>
-          {children}
+        <Providers>
+          <main>
+           {children}
+          </main>
+        </Providers>
       </body>
     </html>
   );

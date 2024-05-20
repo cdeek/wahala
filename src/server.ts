@@ -4,10 +4,10 @@ import dotenv from 'dotenv';
 import next from 'next';
 import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
-// import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express';
 
-// import typeDefs from './backend/graphql/typeDefs';
-// import resolvers from './backend/graphql/resolvers';
+import typeDefs from './backend/graphql/typeDefs';
+import resolvers from './backend/graphql/resolvers';
 
 dotenv.config();
 
@@ -30,10 +30,10 @@ const start = async () => {
       res.json({ message: 'API route example' });
     });
 
-    // Apollo Server (if needed)
-    // const server = new ApolloServer({ typeDefs, resolvers });
-    // await server.start();
-    // server.applyMiddleware({ app });
+    // Apollo Server
+    const server = new ApolloServer({ typeDefs, resolvers });
+    await server.start();
+    server.applyMiddleware({ app });
 
     // Handle all other requests with Next.js
     app.all('*', (req: Request, res: Response) => {

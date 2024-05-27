@@ -1,0 +1,61 @@
+.formContainer {
+  max-width: 200px;
+  width: 100%;
+  padding: 50px;
+  border-radius: 10px;
+}
+
+.formTitle {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.formContainer h3 {
+   margin: 0;
+}
+
+.formContainer .handImg {
+  height: 24px;
+}
+
+.form {
+  margin-bottom: var(--base);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base) / 2);
+  align-items: flex-start;
+  width: 66.66%;
+}
+
+.submit {
+  margin-top: calc(var(--base) / 2);
+}
+
+.message {
+  margin-bottom: var(--base);
+}
+
+@media (max-width: 768px) {
+  .formContainer {
+    backdrop-filter: blur(30px);
+    background-color: rgba(255, 255, 255, 0.9) ;
+    box-shadow: 0, 1px 2px 0 rgba(0 0 0 /0.05);
+  }
+
+  .formContainer h3 {
+    font-size: 34px;
+    margin-bottom: 8px;
+  }
+
+  .form {
+    width: 100%;
+  }
+}
+
+@media (max-width: var(--breakpoint-s-width)) {
+  .formContainer {
+    padding: 30px;
+  }
+}

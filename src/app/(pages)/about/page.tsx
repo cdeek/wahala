@@ -52,7 +52,7 @@ export default function AboutPage() {
         <button className="bg-red-700 p-2 rounded-md">Subscribe</button>
       </div>
       <br />
-      <p className="text-gray-700">
+      <p className="">
         Thank you for choosing Diksa. We appreciate your trust and look forward to serving you
         and providing an exceptional shopping experience.
       </p><br />

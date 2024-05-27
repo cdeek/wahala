@@ -1,4 +1,5 @@
-import path from 'path';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import { parse } from 'url';
 import dotenv from 'dotenv';
 import next from 'next';
@@ -6,8 +7,11 @@ import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { ApolloServer } from 'apollo-server-express';
 
+
 import typeDefs from './backend/graphql/typeDefs';
 import resolvers from './backend/graphql/resolvers';
+import { userAuthed } from './backend/routes';
+
 
 dotenv.config();
 
@@ -24,16 +28,19 @@ const start = async () => {
     // Prepare Next.js app
     await nextApp.prepare();
 
+    // Middleware
+    app.use(express.json());
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(cookieParser());
+
     // Custom Express routes
-    app.get('/api/products', (req: Request, res: Response) => {
-      // Handle API requests
-      res.json({ message: 'API route example' });
-    });
+    app.use('/api/user', userAuthed);
 
     // Apollo Server
     const server = new ApolloServer({ typeDefs, resolvers });
     await server.start();
-    server.applyMiddleware({ app });
+    server.applyMiddleware({ app, path: '/api/graphql' });
 
     // Handle all other requests with Next.js
     app.all('*', (req: Request, res: Response) => {
@@ -43,7 +50,7 @@ const start = async () => {
 
     // Start the Express server
     app.listen(PORT, () => {
-      console.log(`> Ready on http://localhost:${PORT}`);
+      console.log(`>🚀 Ready on ${process.env.SERVER_URL}:${PORT}`);
     });
   } catch (err) {
     if (err instanceof Error) {

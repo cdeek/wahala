@@ -1,11 +1,5 @@
-import {ModeToggle} from "@/components/ChangeTheme";
+import PageTemplate, { metadata } from './(pages)/[slug]/page'
 
+export default PageTemplate
 
-export default function Home() {
-  return (
-    <main className="">
-      <ModeToggle className="float-right" />
-      <h1 className="text-red-500">Diksa</h1>
-    </main>
-  );
-}
+export { metadata }

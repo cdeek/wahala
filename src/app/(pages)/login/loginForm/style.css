@@ -37,7 +37,7 @@
   margin-bottom: var(--base);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1028px) {
   .formContainer {
     backdrop-filter: blur(30px);
     background-color: rgba(255, 255, 255, 0.9) ;
@@ -54,7 +54,7 @@
   }
 }
 
-@media (max-width: var(--breakpoint-s-width)) {
+@media (max-width: 768px){
   .formContainer {
     padding: 30px;
   }

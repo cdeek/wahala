@@ -6,7 +6,7 @@ import next from 'next';
 import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { ApolloServer } from 'apollo-server-express';
-
+import cors from 'cors';
 
 import typeDefs from './backend/graphql/typeDefs';
 import resolvers from './backend/graphql/resolvers';
@@ -29,6 +29,7 @@ const start = async () => {
     await nextApp.prepare();
 
     // Middleware
+    app.use(cors());
     app.use(express.json());
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
@@ -50,7 +51,7 @@ const start = async () => {
 
     // Start the Express server
     app.listen(PORT, () => {
-      console.log(`>🚀 Ready on ${process.env.SERVER_URL}:${PORT}`);
+      console.log(`>🚀 Ready on ${process.env.SERVER_URL}`);;
     });
   } catch (err) {
     if (err instanceof Error) {

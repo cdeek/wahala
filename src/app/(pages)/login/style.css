@@ -31,10 +31,10 @@
 }
 
 .params {
-  margin-top: var(--base);
+  margin-top: 24px;
 }
 
-@media (max-width: 1024px) {
+@media (width <= 768px) {
   .login {
     grid-template-columns: 1fr;
     background-size: cover;

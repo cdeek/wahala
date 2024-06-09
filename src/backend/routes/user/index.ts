@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User } from '../../models';
@@ -8,66 +8,53 @@ import errorHandler from './errorHandler';
 const router = express.Router();
 
 // JWT
-const createToken = (_id: string): string => {
-  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: '2d' });
+const createToken = (id: string): string => {
+  return jwt.sign({ id }, process.env.SECRET as string, { expiresIn: '1d' });
 };
 
 // Login
-router.post('/login', async (req: Request, res: Response, next) => {
+router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
+  const userEmail: string = email.toLowerCase();
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'All fields must be filled' });
-  }
-  
   try {
-    const user = await User.findOne({ email });
-    const matchPassword = await bcrypt.compare(password, user.password || '');
-    
-    if (!user || !matchPassword) {
-      throw new Error('Incorrect email or Incorrect password');
+    const user = await User.findOne({ email: userEmail });
+    if (!user) {
+      throw new Error('Incorrect email or password');
+    }
+
+    const matchPassword = await bcrypt.compare(password, user.password);
+    if (!matchPassword) {
+      throw new Error('Incorrect email or password');
     }
 
     const token = createToken(user._id.toString());
-    res.cookie('user', JSON.stringify({name: user.name, roles: user.roles, token}), { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-    res.status(201).json({ user });
-    
+    res.cookie('user', JSON.stringify({ ...user.toJSON(), token }), { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.status(200).json({ ...user.toJSON(), token });
+
   } catch (error) {
     next(error);
   }
 });
 
 // Signup
-router.post('/create', async (req: Request, res: Response, next) => {
-  const { name, email, password, passwordConfirm } = req.body;
-  const errors: string[] = [];
-  
-  if (!validator.isEmail(email)) {
-    errors.push('Input a valid email');
-  }
-  if (!validator.isStrongPassword(password)) {
-    errors.push('Password is not strong enough');
-  }
+router.post('/create', async (req: Request, res: Response, next: NextFunction) => {
+  const { name, email, password } = req.body;
 
-  if (password !== passwordConfirm) {
-      errors.push('Passwords do not match');
-  }
-
-  if (errors.length > 0) {
-    res.status(400).json({ errors });
-    return;
-  }
-    
   try {
-    const exist = await User.findOne({ email });
+    if (!validator.isStrongPassword(password)) {
+      throw new Error('Password is not strong enough');
+    }
+
+    const userEmail: string = email.toLowerCase();
+    const exist = await User.findOne({ email: userEmail });
     if (exist) {
-      return res.status(400).json({ errors: 'Email already exists' });
+      throw new Error('Email already exists, login');
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const userEmail = email.toLowerCase();
     const user = await User.create({
       name,
       email: userEmail,
@@ -76,41 +63,48 @@ router.post('/create', async (req: Request, res: Response, next) => {
     });
 
     const token = createToken(user._id.toString());
+    res.cookie('user', JSON.stringify({ ...user.toJSON(), token }), { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.status(201).json({ ...user.toJSON(), token });
 
-    res.cookie('user', JSON.stringify({name, roles: ['customer'], token}), { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-    res.status(201).json({ user });
   } catch (error) {
     next(error);
   }
 });
 
-// get user
-router.get('/me', async (req: Request, res: Response, next) => {
-  const token = req.cookies.user;
-  if (!token) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
-  }
+// Get user
+router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
+  const userCookie = req.cookies.user;
 
   try {
-    const decoded = jwt.verify(JSON.parse(token).token, process.env.SECRET as string) as { userId: string };
-    const user = await User.findById(decoded.userId);
-    res.status(200).json({ user });  
-  } catch (error) {
-    next(error)
-  }
-})
+    if (!userCookie) {
+      throw new Error('Unauthorized');
+    }
 
-// Logout
-router.get('/logout', async (req: Request, res: Response, next) => {
-  try {
-    res.cookie('user', '', { maxAge: 1 });
-    res.status(200).json({ message: 'Logged out' });
+    const { token } = JSON.parse(userCookie);
+    const decoded = jwt.verify(token, process.env.SECRET as string) as { id: string };
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      throw new Error('Unauthorized');
+    }
+
+    res.status(200).json(user.toJSON());
   } catch (error) {
     next(error);
   }
-})
+});
+
+// Logout
+router.get('/logout', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    res.cookie('user', '', { maxAge: 1 });
+    res.status(200).send('Logged out');
+  } catch (error) {
+    next(error);
+  }
+});
 
 // Error handling middleware should be the last piece of middleware added
 router.use(errorHandler);
+
 export default router;

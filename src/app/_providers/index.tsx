@@ -3,7 +3,7 @@
 import React from "react";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 
-//import { AuthProvider } from '../_providers/Auth'
+import { AuthProvider } from '../_providers/Auth'
 //import { CartProvider } from '../_providers/Cart'
 import { ThemeProvider } from "./Theme";
 
@@ -22,10 +22,9 @@ export const Providers: React.FC<{
       enableSystem
       disableTransitionOnChange
     >
-      {/*<AuthProvider>
-              <CartProvider>{children}</CartProvider>
-            </AuthProvider>*/}
+    <AuthProvider>
       {children}
+    </AuthProvider>
     </ThemeProvider>
   );
 };

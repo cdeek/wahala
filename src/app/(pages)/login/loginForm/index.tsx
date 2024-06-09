@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/ui/input";
-// import { Message } from '@/components/Message'
+import { Message } from "@/components/Message";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../../_providers/Auth";
 
 import "./style.css";
@@ -28,18 +29,19 @@ type FormData = {
 
 const LoginForm: React.FC = () => {
   const searchParams = useSearchParams();
-  const allParams = searchParams.toString()
-    ? `?${searchParams.toString()}`
-    : "";
+  const allParams = searchParams.toString() ? `?${searchParams.toString()}` : "";
   const redirect = useRef(searchParams.get("redirect"));
   const { login } = useAuth();
   const router = useRouter();
   const [error, setError] = React.useState<string | null>(null);
+  const [showPassword, setShowPassword] = React.useState<boolean>(false);
+
+  const Icon = showPassword ? Eye : EyeOff;
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isLoading },
+    formState: { errors, isSubmitting },
   } = useForm<FormData>();
 
   const onSubmit = useCallback(
@@ -49,10 +51,8 @@ const LoginForm: React.FC = () => {
         if (redirect?.current) router.push(redirect.current as string);
         else router.push("/");
       } catch (err) {
+        setError(err.message);
         console.log(err);
-        setError(
-          "There was an error with the credentials provided. Please try again.",
-        );
       }
     },
     [login, router],
@@ -62,7 +62,7 @@ const LoginForm: React.FC = () => {
     <Card className="formContainer">
       <CardHeader>
         <CardTitle className="formTitle">
-          <h4>Welcome</h4>
+          Welcome back!
           <Image
             src="/assets/icons/hand-wave.png"
             alt="icon"
@@ -75,8 +75,8 @@ const LoginForm: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="form">
-          {/* <Message error={error} className="message" /> */}
+        <form onSubmit={handleSubmit(onSubmit)} method="POST" className="form">
+          <Message error={error} className="message" />
           <Input
             name="email"
             label="Email Address"
@@ -85,19 +85,24 @@ const LoginForm: React.FC = () => {
             error={errors.email}
             type="email"
           />
-          <Input
-            name="password"
-            type="password"
-            label="Password"
-            required
-            register={register}
-            error={errors.password}
-          />
+          <div className="relative w-full">
+            <Input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              label="Password"
+              required
+              register={register}
+              error={errors.password}
+            />
+            <span className="eyeIcon" onClick={() => setShowPassword(!showPassword)}>
+              <Icon />
+            </span>
+          </div>
           <Button
             type="submit"
             appearance="default"
-            label={isLoading ? "Processing" : "Login"}
-            disabled={isLoading}
+            label={isSubmitting ? "Processing" : "Login"}
+            disabled={isSubmitting}
             className="submit"
           />
         </form>

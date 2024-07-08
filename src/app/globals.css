@@ -33,6 +33,12 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+    --base: 24px;
+
+    --breakpoint-xs-width: 400px;
+    --breakpoint-s-width: 768px;
+    --breakpoint-m-width: 1024px;
+    --breakpoint-l-width: 1440px;
   }
 
   .dark {
@@ -72,13 +78,6 @@
   }
 }
 
-:root {
-  --breakpoint-xs-width: 400px;
-  --breakpoint-s-width: 768px;
-  --breakpoint-m-width: 1024px;
-  --breakpoint-l-width: 1440px;
-}
-
 body {
   margin: 0;
   padding: 0;
@@ -86,6 +85,7 @@ body {
   flex-flow: column;
   font-size: 18px;
   line-height: 32px;
+  min-height: 100vh;
   @apply bg-background text-foreground;
 }
 
@@ -130,7 +130,6 @@ h6 {
 }
 
 h1 {
-  margin: 40px 0;
   font-size: 64px;
   line-height: 70px;
   font-weight: bold;
@@ -138,14 +137,12 @@ h1 {
 
 @media (max-width: var(--breakpoint-m-width)) {
   h1 {
-    margin: 24px 0;
     font-size: 42px;
     line-height: 42px;
   }
 }
 
 h2 {
-  margin: 28px 0;
   font-size: 48px;
   line-height: 54px;
   font-weight: bold;
@@ -153,14 +150,12 @@ h2 {
 
 @media (max-width: var(--breakpoint-m-width)) {
   h2 {
-    margin: 22px 0;
     font-size: 32px;
     line-height: 40px;
   }
 }
 
 h3 {
-  margin: 24px 0;
   font-size: 32px;
   line-height: 40px;
   font-weight: bold;
@@ -168,17 +163,16 @@ h3 {
 
 @media (max-width: var(--breakpoint-m-width)) {
   h3 {
-    margin: 20px 0;
     font-size: 26px;
     line-height: 32px;
   }
 }
 
 h4 {
-  margin: 20px 0;
-  font-size: 26px;
-  line-height: 32px;
-  font-weight: bold;
+  font-size: 30px;
+  line-height: 43px;
+  font-weight: 400;
+  letter-spacing: 0em;
 }
 
 @media (max-width: var(--breakpoint-m-width)) {
@@ -189,7 +183,6 @@ h4 {
 }
 
 h5 {
-  margin: 20px 0;
   font-size: 22px;
   line-height: 30px;
   font-weight: bold;
@@ -203,7 +196,6 @@ h5 {
 }
 
 h6 {
-  margin: 20px 0;
   font-size: inherit;
   line-height: inherit;
   font-weight: bold;

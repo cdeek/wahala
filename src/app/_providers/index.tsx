@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 
 import { AuthProvider } from '../_providers/Auth'
 //import { CartProvider } from '../_providers/Cart'
 import { ThemeProvider } from "./Theme";
 
 const client = new ApolloClient({
-  uri: "/api/graphql",
+  uri: process.env.GRAPHQL,
   cache: new InMemoryCache(),
 });
 
@@ -23,7 +23,9 @@ export const Providers: React.FC<{
       disableTransitionOnChange
     >
     <AuthProvider>
-      {children}
+      <ApolloProvider client={client}>
+        {children}
+      </ApolloProvider>
     </AuthProvider>
     </ThemeProvider>
   );

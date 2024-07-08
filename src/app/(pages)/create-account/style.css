@@ -34,7 +34,7 @@
   margin-top: 24px;
 }
 
-@media (width <= 768px) {
+@media (width: var(--breakpoint-s-width)) {
   .login {
     grid-template-columns: 1fr;
     background-size: cover;

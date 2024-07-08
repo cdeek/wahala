@@ -1,7 +1,6 @@
 'use client'
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { User } from '../../../backend/types';
 
 type ResetPassword = (args: {
   password: string;
@@ -18,8 +17,8 @@ type Login = (args: { email: string; password: string }) => Promise<void>;
 type Logout = () => Promise<void>;
 
 interface AuthContext {
-  user?: User | null;
-  setUser: (user: User | null) => void;
+  token?: string | null;
+  setToken: (token: string | null) => void;
   logout: Logout;
   login: Login;
   create: Create;
@@ -31,7 +30,7 @@ interface AuthContext {
 const Context = createContext<AuthContext | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [status, setStatus] = useState<undefined | 'loggedOut' | 'loggedIn'>(undefined);
 
   const create = useCallback<Create>(async (args) => {
@@ -51,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const json = await res.json();
-      setUser(json);
+      setToken(json.token);
       setStatus('loggedIn');
     } catch (e) {
       throw new Error(e.message || 'An error occurred while creating the account.');
@@ -75,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const json = await res.json();
-      setUser(json);
+      setToken(json.token);
       setStatus('loggedIn');
     } catch (e) {
       throw new Error(e.message || 'An error occurred while logging in.');
@@ -96,7 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Failed to logout');
       }
 
-      setUser(null);
+      setToken(null);
       setStatus('loggedOut');
     } catch (e) {
       throw new Error(e.message || 'An error occurred while logging out.');
@@ -119,10 +118,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         const json = await res.json();
-        setUser(json || null);
+        console.log(json);
+        setToken(json.token || null);
         setStatus(json ? 'loggedIn' : 'loggedOut');
       } catch (e) {
-        setUser(null);
+        setToken(null);
         setStatus('loggedOut');
       }
     };
@@ -167,7 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const json = await res.json();
-      setUser(json);
+      setToken(json.token);
       setStatus(json ? 'loggedIn' : undefined);
     } catch (e) {
       throw new Error(e.message || 'An error occurred while resetting the password.');
@@ -177,8 +177,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <Context.Provider
       value={{
-        user,
-        setUser,
+        token,
+        setToken,
         login,
         logout,
         create,

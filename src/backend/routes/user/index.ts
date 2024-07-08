@@ -29,8 +29,8 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
     }
 
     const token = createToken(user._id.toString());
-    res.cookie('user', JSON.stringify({ ...user.toJSON(), token }), { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-    res.status(200).json({ ...user.toJSON(), token });
+    res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.status(200).json({token: token});
 
   } catch (error) {
     next(error);
@@ -63,8 +63,8 @@ router.post('/create', async (req: Request, res: Response, next: NextFunction) =
     });
 
     const token = createToken(user._id.toString());
-    res.cookie('user', JSON.stringify({ ...user.toJSON(), token }), { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-    res.status(201).json({ ...user.toJSON(), token });
+    res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.status(201).json({token: token});
 
   } catch (error) {
     next(error);
@@ -73,22 +73,21 @@ router.post('/create', async (req: Request, res: Response, next: NextFunction) =
 
 // Get user
 router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
-  const userCookie = req.cookies.user;
+  const userToken = req.cookies.token;
 
   try {
-    if (!userCookie) {
+    if (!userToken) {
       throw new Error('Unauthorized');
     }
 
-    const { token } = JSON.parse(userCookie);
-    const decoded = jwt.verify(token, process.env.SECRET as string) as { id: string };
+    const decoded = jwt.verify(userToken, process.env.SECRET as string) as { id: string };
 
     const user = await User.findById(decoded.id);
     if (!user) {
       throw new Error('Unauthorized');
     }
 
-    res.status(200).json(user.toJSON());
+    res.status(200).json({token: userToken});
   } catch (error) {
     next(error);
   }
@@ -97,7 +96,7 @@ router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
 // Logout
 router.get('/logout', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.cookie('user', '', { maxAge: 1 });
+    res.cookie('token', '', { maxAge: 1 });
     res.status(200).send('Logged out');
   } catch (error) {
     next(error);

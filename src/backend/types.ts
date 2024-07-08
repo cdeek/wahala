@@ -29,7 +29,7 @@ export interface Config {
 }
 
 export interface Page {
-  id: string
+  _id: string
   title: string
   publishedOn?: string | null
   hero: {
@@ -63,7 +63,7 @@ export interface Page {
 }
 
 export interface Media {
-  id: string
+  _id: string
   alt: string
   caption?: { [k: string]: unknown }[] | null
   updatedAt: string
@@ -77,23 +77,28 @@ export interface Media {
 }
 
 export interface Product {
-  id: string
+  _id: string
   title: string
   publishedOn?: string | null
   stripeProductID?: string | null
   priceJSON?: string | null
   categories?: (string | Category)[] | null
   relatedProducts?: (string | Product)[] | null
-  slug?: string | null
   skipSync?: boolean | null
-  meta?: Meta
+  meta?: {
+    title?: string | null
+    description?: string | null
+    image?: string | Media | null
+    keywords?: string[] | null
+  }
+  sellerId: string
   updatedAt: string
   createdAt: string
-  _status?: 'draft' | 'published' | null
+  _status?: ('draft' | 'published') | null
 }
 
 export interface User {
-  id: string
+  _id: string
   name?: string | null
   roles?: ('admin' | 'customer')[] | null
   purchases?: (string | Product)[] | null
